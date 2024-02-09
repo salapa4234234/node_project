@@ -1,9 +1,11 @@
 import express from "express";
 import ViteExpress from "vite-express";
 import { db } from "./config/database.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.get("/api/todos", (req, res) => {
   const q = "SELECT * FROM todos";
