@@ -15,12 +15,30 @@ app.get("/api/todos", (req, res) => {
   });
 });
 
+app.get("/api/todos/:id", (req, res) => {
+  const todoId = req.params.id;
+  const q = "SELECT * FROM todos WHERE id=?";
+  db.query(q, [todoId], (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  });
+});
+
 app.post("/api/todos", (req, res) => {
   const q = "INSERT INTO todos(`task`,`completed`) values(?)";
   const values = [req.body.task, req.body.completed];
   db.query(q, [values], (err, data) => {
     if (err) return res.json(err);
     return res.json({ msg: "Todos created successfully!" });
+  });
+});
+app.patch("/api/todos/:id", (req, res) => {
+  const todoId = req.params.id;
+  const q = "UPDATE todos SET task=?,is_editing=? WHERE id=?";
+  const values = [req.body.task, req.body.is_editing];
+  db.query(q, [...values, todoId], (err, data) => {
+    if (err) return res.json(err);
+    return res.json({ msg: "Todos updated successfully!" });
   });
 });
 
@@ -58,8 +76,8 @@ app.put("/api/todos/:id", (req, res) => {
 });
 app.patch("/api/todos/:id", (req, res) => {
   const todoId = req.params.id;
-  const q = "UPDATE todos SET is_editing=?, completed=? WHERE id=?";
-  const values = [req.body.is_editing, req.body.completed];
+  const q = "UPDATE todos SET task=?, is_editing=?, completed=? WHERE id=?";
+  const values = [req.body.task, req.body.is_editing, req.body.completed];
 
   // Only update fields that are present in the request body
   const filteredValues = values.filter((value) => value !== undefined);
